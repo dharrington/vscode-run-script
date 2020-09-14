@@ -32,6 +32,8 @@ Arguments for run:
 
 *showStdoutPopup*: Whether to show stdout in a popup.
 
+*showStderrPopup*: Whether to show stderr in a popup.
+
 *copyStdoutToClipboard*: Whether to copy stdout to clipboard.
 
 *timeout*: Kill the process after this many seconds.
@@ -66,7 +68,8 @@ There are a few built-in commands provided by this extension:
     "line": 42,
     "column": 5,
     "toLine": 45,
-    "toColumn": 6
+    "toColumn": 6,
+    "text": "some text"
   }
 
   {
@@ -107,3 +110,11 @@ Command run-script.killAll: Terminate any previously started processes.
 ### 1.0.0
 
 Initial release!
+
+### 1.0.1
+
+Add showStderrPopup option.
+
+Fixed some bugs:
+* stdout/stderr was concatenated incorrectly
+* showStdoutPopup works even if the process exits uncleanly

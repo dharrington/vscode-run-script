@@ -160,6 +160,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const runCommand = (args: any, choice: string) => {
 		const parseStdout = args.hasOwnProperty('parseStdout') ? args.parseStdout : false;
 		const showStdoutPopup = args.hasOwnProperty('showStdoutPopup') ? args.parseStdout : false;
+		const showStderrPopup = args.hasOwnProperty('showStderrPopup') ? args.showStderrPopup : false;
 		const copyStdoutToClipboard = args.hasOwnProperty('copyStdoutToClipboard') ? args.parseStdout : false;
 		const sendFileTextToStdin = args.hasOwnProperty('sendFileTextToStdin') ? args.sendFileTextToStdin : false;
 		const timeout = args.hasOwnProperty('timeout') ? args.timeout : 0.0;
@@ -192,22 +193,25 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		proc.stdin.end();
 		proc.on("exit", (exitCode) => {
-			const stdout = stdoutBuffer.join();
-			const stderr = stderrBuffer.join();
+			const stdout = stdoutBuffer.join('');
+			const stderr = stderrBuffer.join('');
 			const index = runningProcesses.indexOf(proc);
 			if (index > -1) {
 				runningProcesses.splice(index, 1);
 			}
 
+			if (showStdoutPopup) {
+				vscode.window.showInformationMessage(stdout);
+			}
+			if (showStderrPopup) {
+				vscode.window.showInformationMessage(stderr);
+			}
 			if (exitCode) {
-				outputChannel.appendLine('run-script: process error: ' + exitCode + "\n" + stderr);
+				outputChannel.appendLine('run-script: process error: ' + exitCode + "\nstderr:\n" + stderr + '\nstdout:\n' + stdout);
 				return;
 			}
 			if (copyStdoutToClipboard) {
 				vscode.env.clipboard.writeText(stdout);
-			}
-			if (showStdoutPopup) {
-				vscode.window.showInformationMessage(stdout);
 			}
 			if (parseStdout) {
 				let result;
