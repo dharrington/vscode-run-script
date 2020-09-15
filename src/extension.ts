@@ -49,7 +49,7 @@ function gotoLine(line: number) {
 }
 
 function open(fileName: string) {
-	vscode.commands.executeCommand('vscode.open', Uri.file(fileName));
+	return vscode.commands.executeCommand('vscode.open', Uri.file(fileName));
 }
 function substituteVariable(text: string, choice: string) {
 	if (text === "${file}") {
@@ -106,7 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if (json.hasOwnProperty('command')) {
 			const cmd = json['command'];
 			if (cmd === 'open') {
-				open(json['path']);
+				return open(json['path']);
 			}
 			if (cmd === 'goToLine') {
 				gotoLine(json['line']);
@@ -129,6 +129,13 @@ export function activate(context: vscode.ExtensionContext) {
 					});
 				}
 				return Promise.resolve();
+			}
+			if (cmd === 'showQuickPick') {
+				const items = json.hasOwnProperty('items') ? json.items : [];
+				const onChoose = json.hasOwnProperty('onChoose') ? json.onChoose : undefined;
+				return vscode.window.showQuickPick(items).then((result) => {
+					runCommand(onChoose, '' + result);
+				});
 			}
 			if (json.hasOwnProperty('args')) {
 				return vscode.commands.executeCommand(json.command, fixUpCommandArgs(json.args));

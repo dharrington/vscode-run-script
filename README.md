@@ -2,6 +2,9 @@
 
 Runs a shell command, and reads the output to do different things.
 
+Lets your external scripts / programs integrate more tightly with vscode: 
+open and modify files, show messages, and more.
+
 ## Features
 
 Includes a single command: run-script.run.
@@ -14,7 +17,6 @@ To use this command, set up shortcuts like this:
         "args": {
             "command": "path/to/some/binary ${file}",
             "parseStdout": true,
-            
         }
     }
 
@@ -27,6 +29,7 @@ Arguments for run:
 * ${lineNumber} - Line number of the cursor.
 * ${column} - Column of the cursor.
 * ${selectedText} - Current selected text.
+* ${config:some.configVar} - Config variable from settings.
 
 *parseStdout*: Whether to interpret the stdout as a JSON command. See the JSON commands section
 
@@ -42,68 +45,94 @@ Arguments for run:
 
 ## JSON Commands
 
-Run the vscode.open command. You can run any built-in command this way.
-Note that built-in commands that take file paths need to use a file:///
-URI.
+If **parseStdout** is enabled for a key binding command, the stdout
+of the script is interpreted as a JSON command. This is a mechanism
+for your scripts to cause effects on vscode.
 
-  {
-    "command": "vscode.open",
-    "args": "file:///path/to/file"
-  }
+There are several built-in commands provided by this extension:
 
-There are a few built-in commands provided by this extension:
+Jump to line in the current file.
 
-  {
-    "command": "goToLine",
-    "line": 42
-  }
-
-  {
-    "command": "open",
-    "path": "path/to/file"
-  }
-
-  {
-    "command": "replaceText",
-    "line": 42,
-    "column": 5,
-    "toLine": 45,
-    "toColumn": 6,
-    "text": "some text"
-  }
-
-  {
-    "command": "showInformationMessage",
-    "message": "It worked",
-    "items": [
-      "Choose one", "Choose two"
-    ],
-    "onChoose": {
-      "command": "echo 'You chose ${choice}'",
-      "showStdoutPopup": true
+    {
+      "command": "goToLine",
+      "line": 42
     }
-  }
+
+Open a file.
+
+    {
+      "command": "open",
+      "path": "path/to/file"
+    }
+
+Insert and/or replace text.
+
+    {
+      "command": "replaceText",
+      "line": 42,
+      "column": 5,
+      "toLine": 45,
+      "toColumn": 6,
+      "text": "some text"
+    }
+
+Show an informational message. Optionally, provide items the user can click.
+
+    {
+      "command": "showInformationMessage",
+      "message": "It worked",
+      "items": [
+        "Choose one", "Choose two"
+      ],
+      "onChoose": {
+        "command": "echo 'You chose ${choice}'",
+        "showStdoutPopup": true
+      }
+    }
+
+Request user input from the quick pick control.
+
+    {
+      "command": "showQuickPick",
+      "items": [
+        "Choose one", "Choose two"
+      ],
+      "onChoose": {
+        "command": "echo 'You chose ${choice}'",
+        "showStdoutPopup": true
+      }
+    }
+
+Or, run any built-in vscode command. This runs the vscode.open command.
+You can run any built-in command this way.
+Note that built-in commands that take file paths need to use a file:/// URI.
+
+    {
+      "command": "vscode.open",
+      "args": "file:///path/to/file"
+    }
 
 Evaluate arbitrary javascript:
 
-  {
-    "code": "vscode.window.activeTextEditor.selection = new vscode.Selection(123, 0, 123, 0);"
-  }
+    {
+      "code": "vscode.window.activeTextEditor.selection = new vscode.Selection(123, 0, 123, 0);"
+    }
 
 Run multiple commands using an array:
 
-  [
-    {
-        "command": ...
-    },
-    {
-        "command": ...
-    }
-  ]
+    [
+      {
+          "command": ...
+      },
+      {
+          "command": ...
+      }
+    ]
 
 ## Extras
 
-Command run-script.killAll: Terminate any previously started processes.
+* Errors are logged to the 'Run-Script' output window.
+* Command run-script.killAll: Terminate any previously started processes.
 
 ## Release Notes
 
@@ -118,3 +147,8 @@ Add showStderrPopup option.
 Fixed some bugs:
 * stdout/stderr was concatenated incorrectly
 * showStdoutPopup works even if the process exits uncleanly
+
+### 1.0.2
+
+* Add showQuickPick
+* Small bugfix, improve readme
