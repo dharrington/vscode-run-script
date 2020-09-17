@@ -58,11 +58,19 @@ Jump to line in the current file.
       "line": 42
     }
 
-Open a file.
+Jump to the first occurence of a search string in the current file.
+
+    {
+      "command": "goToText",
+      "text": "some match"
+    }
+
+Open a file. 
 
     {
       "command": "open",
       "path": "path/to/file"
+      // You can also specify "text" or "line" to jump to text or line.
     }
 
 Insert and/or replace text.
@@ -81,11 +89,16 @@ Show an informational message. Optionally, provide items the user can click.
     {
       "command": "showInformationMessage",
       "message": "It worked",
+      // Interactivity, optional:
       "items": [
         "Choose one", "Choose two"
       ],
       "onChoose": {
         "command": "echo 'You chose ${choice}'",
+        "showStdoutPopup": true
+      }
+      "onCancel": {
+        "command": "echo 'User did not pick anything'",
         "showStdoutPopup": true
       }
     }
@@ -99,6 +112,10 @@ Request user input from the quick pick control.
       ],
       "onChoose": {
         "command": "echo 'You chose ${choice}'",
+        "showStdoutPopup": true
+      },
+      "onCancel": {
+        "command": "echo 'User did not pick anything'",
         "showStdoutPopup": true
       }
     }
@@ -152,3 +169,11 @@ Fixed some bugs:
 
 * Add showQuickPick
 * Small bugfix, improve readme
+
+### 1.0.3
+
+* Add goToText
+* Add onCancel for showInformationMessage and showQuickPick.
+* Trailing comma and comments are now allowed in json.
+* Changed default process CWD to workspace folder.
+* Some bugfixes.
